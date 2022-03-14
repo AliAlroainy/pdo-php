@@ -1,88 +1,43 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>pdo</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
-
-</head>
-<body>
-
-<?php 
-// Start session 
-session_start(); 
- 
-// Get data from session 
-$sessData = !empty($_SESSION['sessData'])?$_SESSION['sessData']:''; 
- 
-// Get status from session 
-if(!empty($sessData['status']['msg'])){ 
-    $statusMsg = $sessData['status']['msg']; 
-    $status = $sessData['status']['type']; 
-    unset($_SESSION['sessData']['status']); 
-} 
- 
-// Include and initialize DB class 
-require_once 'DB.class.php'; 
-$db = new DB(); 
- 
-// Fetch the users data 
-$users = $db->getRows('users', array('order_by'=>'id DESC')); 
- 
-// Retrieve status message from session 
-if(!empty($_SESSION['statusMsg'])){ 
-    echo '<p>'.$_SESSION['statusMsg'].'</p>'; 
-    unset($_SESSION['statusMsg']); 
-} 
+<?php
+include_once 'dbconfig.php';
 ?>
+<?php include_once 'header.php'; ?>
 
-<div class="row">
-    <div class="col-md-12 head">
-        <h5>Users</h5>
-        <!-- Add link -->
-        <div class="float-right">
-            <a href="add.php" class="btn btn-success"><i class="plus"></i> New User</a>
-        </div>
-    </div>
-    
-    <!-- Status message -->
-    <?php if(!empty($statusMsg)){ ?>
-        <div class="alert alert-<?php echo $status; ?>"><?php echo $statusMsg; ?></div>
-    <?php } ?>
+<div class="clearfix"></div>
 
-    <!-- List the users -->
-    <table class="table table-striped table-bordered">
-        <thead class="thead-dark">
-            <tr>
-                <th width="5%">#</th>
-                <th width="20%">Name</th>
-                <th width="25%">Email</th>
-                <th width="18%">Phone</th>
-                <th width="18%">Created</th>
-                <th width="14%">Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php if(!empty($users)){ $i=0; foreach($users as $row){ $i++; ?>
-            <tr>
-                <td><?php echo $i; ?></td>
-                <td><?php echo $row['name']; ?></td>
-                <td><?php echo $row['email']; ?></td>
-                <td><?php echo $row['phone']; ?></td>
-                <td><?php echo $row['created']; ?></td>
-                <td>
-                    <a href="edit.php?id=<?php echo $row['id']; ?>" class="btn btn-warning">edit</a>
-                    <a href="action.php?action_type=delete&id=<?php echo $row['id']; ?>" class="btn btn-danger" onclick="return confirm('Are you sure to delete data?');">delete</a>
-                </td>
-            </tr>
-            <?php } }else{ ?>
-            <tr><td colspan="5">No user(s) found...</td></tr>
-            <?php }  ?>
-        </tbody>
-    </table>
+<div class="container">
+<a href="add-data.php" class="btn btn-large btn-info"><i class="glyphicon glyphicon-plus"></i> &nbsp; Add Records</a>
 </div>
-    
-</body>
-</html>
+
+<div class="clearfix"></div><br />
+
+<div class="container">
+     <table class='table table-bordered table-responsive'>
+     <tr>
+     <th>Id</th>
+     <th>First Name</th>
+     <th>Last Name</th>
+     <th>E - mail ID</th>
+     <th>Contact No</th>
+     <th colspan="2" align="center">Actions</th>
+     </tr>
+     <?php
+  $query = "SELECT * FROM tbl_users";       
+  $records_per_page=3;
+  $newquery = $crud->paging($query,$records_per_page);
+  $crud->dataview($newquery);
+  ?>
+    <tr>
+        <td colspan="7" align="center">
+    <div class="pagination-wrap" style="padding:10px; ">
+            <?php $crud->paginglink($query,$records_per_page); ?>
+         </div>
+        </td>
+    </tr>
+ 
+</table>
+   
+       
+</div>
+
+<?php include_once 'footer.php'; ?>
